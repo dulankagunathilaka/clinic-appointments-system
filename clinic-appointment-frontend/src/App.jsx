@@ -18,6 +18,10 @@ import Navbar from "./components/Navbar";
 import BlogsPage from "./Home/BlogsPage";
 import ContactUsPage from "./Home/ContactUsPage";
 
+// Patient
+import PatientProfile from "./patient/PatientProfile";
+import MyAppointments from "./patient/MyAppointments";
+
 const App = () => {
   return (
     <Router>
@@ -50,7 +54,10 @@ const App = () => {
           <Route path="profile" element={<Profile />} />
           </Route>
 
-        
+      {/* Patient Routes */}
+          <Route path="/PatientProfile" element={<PatientProfile />} />
+          <Route path="/MyAppointments" element={<MyAppointments />} />
+
       </Routes>
     </Router>
   );
