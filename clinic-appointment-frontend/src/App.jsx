@@ -10,10 +10,19 @@ import Appointments from "./admin/Appointments";
 import ClinicSettings from "./admin/ClinicSettings";
 import Profile from "./admin/Profile";
 
+// Home
+import Home from "./Home/Home";
+import AboutUsPage from "./Home/AboutUsPage";
+import ServicePage from "./Home/ServicePage";
+
 const App = () => {
   return (
     <Router>
       <Routes>
+
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutUsPage />} />
+        <Route path="/services" element={<ServicePage />} />
         {/* Admin Routes */}
         <Route path="/admin/*" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
@@ -22,7 +31,9 @@ const App = () => {
           <Route path="appointments" element={<Appointments />} />
           <Route path="settings" element={<ClinicSettings />} />
           <Route path="profile" element={<Profile />} />
-        </Route>
+          </Route>
+
+        
       </Routes>
     </Router>
   );
