@@ -4,7 +4,7 @@ import AboutUsSection from './AboutUsSection';
 import ServicesSection from './ServicesSection';
 import FAQSection from './FAQSection';
 import WorkingProcessSection from './WorkingProcessSection';
-import AppointmentFormSection from './AppointmentFormSection'; 
+import AppointmentFormSection from './AppointmentFormSection';
 import EmergencyContactSection from './EmergencyContactSection';
 import TeamSection from './TeamSection';
 import TestimonialsSection from './TestimonialsSection';
@@ -14,25 +14,32 @@ import Navbar from '../components/Navbar';
 
 const Home = () => {
   return (
-    
     <div className="min-h-screen w-full">
-      <Navbar />   
+      {/* Fixed Navigation Bar */}
+      <Navbar />
 
-      <main className="container mx-auto pt-[115px]">
-        <section id="home">
+      {/* Page Content */}
+      <main className="pt-[115px]">
+        {/* Hero Section (Full Width) */}
+        <section id="home" className="w-full">
           <HeroSection />
         </section>
-        <AboutUsSection />
-        <ServicesSection />
-        <FAQSection />
-        <WorkingProcessSection />
-        <AppointmentFormSection /> 
-        <EmergencyContactSection />
-        <TeamSection />
-        <TestimonialsSection />
-        <BlogSection />
+
+        {/* Centered Sections */}
+        <div className="container mx-auto">
+          <AboutUsSection />
+          <ServicesSection />
+          <FAQSection />
+          <WorkingProcessSection />
+          <AppointmentFormSection />
+          <EmergencyContactSection />
+          <TeamSection />
+          <TestimonialsSection />
+          <BlogSection />
+        </div>
       </main>
 
+      {/* Footer */}
       <FooterSection />
     </div>
   );

@@ -14,16 +14,33 @@ import Profile from "./admin/Profile";
 import Home from "./Home/Home";
 import AboutUsPage from "./Home/AboutUsPage";
 import ServicePage from "./Home/ServicePage";
+import Navbar from "./components/Navbar";
+import BlogsPage from "./Home/BlogsPage";
+import ContactUsPage from "./Home/ContactUsPage";
 
 const App = () => {
   return (
     <Router>
       <Routes>
+      {/* Public Website Layout */}
+      <Route
+        path="/*"
+        element={
+          <>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutUsPage />} />
+              <Route path="/services" element={<ServicePage />} />
+              <Route path="/blog" element={<BlogsPage />} />
+              <Route path="/contact" element={<ContactUsPage />} />
+            </Routes>
+          </>
+        }
+      />
 
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutUsPage />} />
-        <Route path="/services" element={<ServicePage />} />
-        {/* Admin Routes */}
+      
+      {/* Admin Routes */}
         <Route path="/admin/*" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="patients" element={<Patients />} />

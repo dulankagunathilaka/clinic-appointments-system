@@ -1,9 +1,9 @@
 //blog page
 
 import React from 'react';
-import BlogHeroSection from '../../components/BlogHeroSection';
+import BlogHeroSection from '../components/BlogHeroSection';
 import BlogSection from './BlogSection';
-import FooterSection from '../../components/FooterSection';
+import FooterSection from '../components/FooterSection';
 
 const BlogsPage = () => {
   return (
