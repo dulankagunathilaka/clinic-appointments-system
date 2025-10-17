@@ -1,0 +1,123 @@
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #ccecff;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-card {
+  display: flex;
+  background: white;
+  border-radius: 8px;
+  width: 70%;
+  max-width: 850px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.login-image {
+  flex: 1;
+  background-color: #f9fcff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.login-image img {
+  width: 100%;
+  max-width: 280px;
+}
+
+.login-form {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-form h2 {
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.login-form input {
+  width: 80%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+.login-form input:focus {
+  border-color: #4a90e2;
+}
+
+.forgot-link {
+  width: 80%;
+  text-align: right;
+  font-size: 13px;
+  color: #4a90e2;
+  text-decoration: none;
+  margin-bottom: 15px;
+}
+
+.login-btn {
+  width: 80%;
+  padding: 10px;
+  background-color: #4a90e2;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.divider {
+  margin: 10px 0;
+  color: #888;
+  font-size: 14px;
+}
+
+.google-btn, .facebook-btn {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.google-btn:hover, .facebook-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.signup-text {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #555;
+}
+
+.signup-text a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}

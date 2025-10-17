@@ -1,0 +1,142 @@
+/* Background */
+.register-page {
+  background-color: #cce9ff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* White container */
+.register-container {
+  background-color: white;
+  display: flex;
+  flex-wrap: wrap;
+  width: 80%;
+  max-width: 900px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Left illustration */
+.image-section {
+  flex: 1;
+  min-width: 300px;
+  background-color: #eaf6ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+.image-section img {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Right form */
+.form-section {
+  flex: 1;
+  padding: 40px 30px;
+}
+.form-section h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Poppins", sans-serif;
+}
+.form-section form {
+  display: flex;
+  flex-direction: column;
+}
+.form-section input,
+.form-section select {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.form-section select {
+  color: #555;
+}
+
+.terms {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.terms input {
+  margin-right: 8px;
+}
+
+.create-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.create-btn:hover {
+  background-color: #2563eb;
+}
+
+.or {
+  text-align: center;
+  margin: 12px 0;
+  font-weight: bold;
+  color: #666;
+}
+
+/* Social buttons */
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+.social-btn img {
+  width: 20px;
+  margin-right: 10px;
+}
+.google:hover {
+  background-color: #f4f4f4;
+}
+.facebook:hover {
+  background-color: #f4f4f4;
+}
+
+/* Login link */
+.login-link {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.login-link a {
+  color: #2563eb;
+  font-weight: bold;
+  text-decoration: none;
+}
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .register-container {
+    flex-direction: column;
+    width: 90%;
+  }
+  .image-section {
+    order: -1;
+  }
+}
