@@ -1,35 +1,77 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Admin
+import AdminLayout from "./admin/AdminLayout";
+import Dashboard from "./admin/Dashboard";
+import Patients from "./admin/Patients";
+import Doctors from "./admin/Doctors";
+import Appointments from "./admin/Appointments";
+import ClinicSettings from "./admin/ClinicSettings";
+import Profile from "./admin/Profile";
 
+// Home
+import Home from "./Home/Home";
+import AboutUsPage from "./Home/AboutUsPage";
+import ServicePage from "./Home/ServicePage";
+import Navbar from "./components/Navbar";
+import BlogsPage from "./Home/BlogsPage";
+import ContactUsPage from "./Home/ContactUsPage";
+
+// Patient
+import PatientProfile from "./patient/PatientProfile";
+import MyAppointments from "./patient/MyAppointments";
+
+//Doctor
+import DoctorAppointments from "./doctor/DoctorAppointments";
+import DoctorLayout from "./doctor/DoctorLayout";
+import DoctorProfile from "./doctor/DoctorProfile";
+import DoctorDashboard from "./doctor/DoctorDashboard";
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        {/* Public Website Layout */}
+        <Route
+          path="/*"
+          element={
+            <>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<AboutUsPage />} />
+                <Route path="/services" element={<ServicePage />} />
+                <Route path="/blog" element={<BlogsPage />} />
+                <Route path="/contact" element={<ContactUsPage />} />
+              </Routes>
+            </>
+          }
+        />
 
-export default App
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="patients" element={<Patients />} />
+          <Route path="doctors" element={<Doctors />} />
+          <Route path="appointments" element={<Appointments />} />
+          <Route path="settings" element={<ClinicSettings />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+
+        {/* Patient Routes */}
+        <Route path="/PatientProfile" element={<PatientProfile />} />
+        <Route path="/MyAppointments" element={<MyAppointments />} />
+
+        {/* Doctor Routes */}
+        <Route path="/doctor/*" element={<DoctorLayout />}>
+          <Route index element={<DoctorDashboard />} />
+          <Route path="appointments" element={<DoctorAppointments />} />
+          <Route path="profile" element={<DoctorProfile />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
