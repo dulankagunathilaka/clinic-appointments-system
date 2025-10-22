@@ -64,9 +64,6 @@ const AppointmentFormSection = () => {
               <FormInput placeholder="Patient Name*" />
               <FormInput placeholder="Email*" />
               
-              <FormInput placeholder="Email Address*" />
-              <FormInput placeholder="Select Department" isSelect={true} />
-              
               <FormInput placeholder="Select Doctor" isSelect={true} />
               <FormInput placeholder="DD/MM/YYYY" icon={Calendar} type="text" />
               
