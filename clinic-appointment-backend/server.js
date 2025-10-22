@@ -4,6 +4,7 @@ import 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import router from './routes/PatientRoutes.js';
+import appointmentRouter from './routes/AppointmentRoutes.js';
 
 // App Config
 const app = express();
@@ -19,6 +20,7 @@ app.use(cors());
 
 // API routes
 app.use('/api/patients', router);
+app.use('/api/appointments', appointmentRouter);
 
 // Test route
 app.get('/', (req, res) => {
