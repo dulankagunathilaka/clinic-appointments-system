@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { MdPerson, MdPhone, MdEmail } from "react-icons/md";
 import { FaStethoscope, FaPills, FaCamera } from "react-icons/fa";
 
@@ -26,6 +27,18 @@ const DoctorProfile = () => {
     address: "No. 123, Galle Road, Colombo 03",
     registration: "SLMC/12345",
     notes: "Specializes in heart conditions. Fluent in Sinhala & English.",
+    firstName: "",
+    lastName: "",
+    title: "",
+    specializations: [],
+    email: "",
+    phone: "",
+    address: "",
+    dob: "",
+    nic: "",
+    registrationNumber: "",
+    fee: 0,
+    notes: "",
     profileImage: "",
     availability: daysOfWeek.reduce((acc, day) => {
       acc[day] = { active: false, from: "09:00", to: "12:00" };
@@ -44,6 +57,22 @@ const DoctorProfile = () => {
       setDoc(JSON.parse(saved));
     }
   }, []);
+  const [imageFile, setImageFile] = useState(null);
+
+  const doctorId = "replace_with_logged_in_doctor_id"; // replace with actual ID
+
+  // Fetch doctor from backend
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      try {
+        const res = await axios.get(`http://localhost:4000/api/doctors/${doctorId}`);
+        setDoc(res.data);
+      } catch (error) {
+        console.error("Error fetching doctor:", error);
+      }
+    };
+    fetchDoctor();
+  }, [doctorId]);
 
   const handleEdit = () => {
     setEditingDoc(doc);
@@ -60,6 +89,7 @@ const DoctorProfile = () => {
     localStorage.setItem("doctorProfile", JSON.stringify(editingDoc));
     setIsEditing(false);
     alert("Doctor profile saved!");
+    setImageFile(null);
   };
 
   const updateField = (field, value) => {
@@ -97,6 +127,40 @@ const DoctorProfile = () => {
         updateField("profileImage", reader.result);
       };
       reader.readAsDataURL(file);
+    if (file) setImageFile(file);
+  };
+
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+
+      // Add all fields
+      for (const key in editingDoc) {
+        if (key === "availability") {
+          formData.append(key, JSON.stringify(editingDoc[key]));
+        } else if (key === "specializations") {
+          formData.append(key, JSON.stringify(editingDoc[key]));
+        } else {
+          formData.append(key, editingDoc[key]);
+        }
+      }
+
+      // Add profile image if changed
+      if (imageFile) formData.append("profileImage", imageFile);
+
+      const res = await axios.put(
+        `http://localhost:4000/api/doctors/${doctorId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setDoc(res.data);
+      setIsEditing(false);
+      setImageFile(null);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to save changes.");
     }
   };
 
@@ -109,6 +173,7 @@ const DoctorProfile = () => {
         <div className="flex justify-between items-center mb-8 border-b pb-4">
           <h1 className="text-3xl font-bold text-gray-800">Doctor Profile</h1>
           {!isEditing ? (
+          {!isEditing && (
             <button
               onClick={handleEdit}
               className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm"
@@ -116,6 +181,7 @@ const DoctorProfile = () => {
               Edit Profile
             </button>
           ) : null}
+          )}
         </div>
 
         {/* Profile Image */}
@@ -125,6 +191,10 @@ const DoctorProfile = () => {
               src={
                 currentDoc.profileImage ||
                 "https://www.outsourceyourmarketing.co.uk/wp-content/uploads/2023/09/doctor-linkedin-marketing-10.jpeg"
+                imageFile
+                  ? URL.createObjectURL(imageFile)
+                  : currentDoc.profileImage ||
+                    "https://www.outsourceyourmarketing.co.uk/wp-content/uploads/2023/09/doctor-linkedin-marketing-10.jpeg"
               }
               alt="Profile"
               className="w-32 h-32 object-cover rounded-full border-4 border-gray-200 shadow"
@@ -226,6 +296,7 @@ const DoctorProfile = () => {
                 <label className="text-sm text-gray-500">
                   Consultation Fee
                 </label>
+                <label className="text-sm text-gray-500">Consultation Fee</label>
                 <input
                   type="number"
                   value={editingDoc.fee}
@@ -237,6 +308,7 @@ const DoctorProfile = () => {
                 <label className="text-sm text-gray-500 block mb-2">
                   Availability
                 </label>
+                <label className="text-sm text-gray-500 block mb-2">Availability</label>
                 <div className="space-y-3">
                   {daysOfWeek.map((day) => (
                     <div
@@ -249,6 +321,7 @@ const DoctorProfile = () => {
                           checked={
                             editingDoc.availability[day]?.active || false
                           }
+                          checked={editingDoc.availability[day]?.active || false}
                           onChange={() => toggleDay(day)}
                         />
                         <span>{day}</span>
@@ -261,6 +334,7 @@ const DoctorProfile = () => {
                             onChange={(e) =>
                               updateTime(day, "from", e.target.value)
                             }
+                            onChange={(e) => updateTime(day, "from", e.target.value)}
                             className="border rounded-md px-2 py-1"
                           />
                           <span>to</span>
@@ -270,6 +344,7 @@ const DoctorProfile = () => {
                             onChange={(e) =>
                               updateTime(day, "to", e.target.value)
                             }
+                            onChange={(e) => updateTime(day, "to", e.target.value)}
                             className="border rounded-md px-2 py-1"
                           />
                         </div>
@@ -284,6 +359,7 @@ const DoctorProfile = () => {
               <p>
                 <strong>Specializations:</strong>{" "}
                 {currentDoc.specializations.join(", ")}
+                <strong>Specializations:</strong> {currentDoc.specializations.join(", ")}
               </p>
               <p>
                 <strong>Fee:</strong> Rs. {currentDoc.fee}

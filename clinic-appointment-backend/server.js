@@ -5,6 +5,7 @@ import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import router from './routes/PatientRoutes.js';
 import appointmentRouter from './routes/AppointmentRoutes.js';
+import doctorRoutes from "./routes/doctorRoutes.js";
 
 // App Config
 const app = express();
@@ -21,6 +22,8 @@ app.use(cors());
 // API routes
 app.use('/api/patients', router);
 app.use('/api/appointments', appointmentRouter);
+app.use("/api/doctors", doctorRoutes);
+
 
 // Test route
 app.get('/', (req, res) => {
