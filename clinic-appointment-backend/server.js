@@ -3,7 +3,9 @@ import cors from 'cors';
 import 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
-import router from './routes/PatientRoutes.js';
+import patientRouter from './routes/PatientRoutes.js';
+import appointmentRouter from './routes/AppointmentRoutes.js';
+
 
 // App Config
 const app = express();
@@ -18,11 +20,12 @@ app.use(express.json());
 app.use(cors());
 
 // API routes
-app.use('/api/patients', router);
+app.use('/api/patients', patientRouter);
+app.use('/api/appointments', appointmentRouter);
 
 // Test route
 app.get('/', (req, res) => {
-  res.send('API Working ');
+  res.send('API Working - Clinic Appointment System');
 });
 
 // Start server
