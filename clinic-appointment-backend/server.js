@@ -37,6 +37,11 @@ app.use("/api/doctors", doctorRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.send("API Working ");
+app.use('/api/patients', router);
+
+// Test route
+app.get('/', (req, res) => {
+  res.send('API Working ');
 });
 
 // Start server
