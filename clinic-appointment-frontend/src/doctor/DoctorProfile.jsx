@@ -15,6 +15,18 @@ const DoctorProfile = () => {
   ];
 
   const defaultDoctor = {
+    firstName: "Amal",
+    lastName: "Perera",
+    nic: "200012345678",
+    dob: "1980-05-10",
+    title: "Consultant Cardiologist",
+    specializations: ["Cardiology", "Internal Medicine"],
+    fee: 5000,
+    phone: "+94 77 123 4567",
+    email: "amal.perera@example.com",
+    address: "No. 123, Galle Road, Colombo 03",
+    registration: "SLMC/12345",
+    notes: "Specializes in heart conditions. Fluent in Sinhala & English.",
     firstName: "",
     lastName: "",
     title: "",
@@ -37,6 +49,14 @@ const DoctorProfile = () => {
   const [doc, setDoc] = useState(defaultDoctor);
   const [editingDoc, setEditingDoc] = useState(defaultDoctor);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("doctorProfile");
+    if (saved) {
+      setDoc(JSON.parse(saved));
+    }
+  }, []);
   const [imageFile, setImageFile] = useState(null);
 
   const doctorId = "replace_with_logged_in_doctor_id"; // replace with actual ID
@@ -62,6 +82,13 @@ const DoctorProfile = () => {
   const handleCancel = () => {
     setEditingDoc(doc);
     setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    setDoc(editingDoc);
+    localStorage.setItem("doctorProfile", JSON.stringify(editingDoc));
+    setIsEditing(false);
+    alert("Doctor profile saved!");
     setImageFile(null);
   };
 
@@ -94,6 +121,12 @@ const DoctorProfile = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateField("profileImage", reader.result);
+      };
+      reader.readAsDataURL(file);
     if (file) setImageFile(file);
   };
 
@@ -139,6 +172,7 @@ const DoctorProfile = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8 border-b pb-4">
           <h1 className="text-3xl font-bold text-gray-800">Doctor Profile</h1>
+          {!isEditing ? (
           {!isEditing && (
             <button
               onClick={handleEdit}
@@ -146,6 +180,7 @@ const DoctorProfile = () => {
             >
               Edit Profile
             </button>
+          ) : null}
           )}
         </div>
 
@@ -154,6 +189,8 @@ const DoctorProfile = () => {
           <div className="relative">
             <img
               src={
+                currentDoc.profileImage ||
+                "https://www.outsourceyourmarketing.co.uk/wp-content/uploads/2023/09/doctor-linkedin-marketing-10.jpeg"
                 imageFile
                   ? URL.createObjectURL(imageFile)
                   : currentDoc.profileImage ||
@@ -256,6 +293,9 @@ const DoctorProfile = () => {
                 />
               </div>
               <div className="mb-4">
+                <label className="text-sm text-gray-500">
+                  Consultation Fee
+                </label>
                 <label className="text-sm text-gray-500">Consultation Fee</label>
                 <input
                   type="number"
@@ -265,6 +305,9 @@ const DoctorProfile = () => {
                 />
               </div>
               <div>
+                <label className="text-sm text-gray-500 block mb-2">
+                  Availability
+                </label>
                 <label className="text-sm text-gray-500 block mb-2">Availability</label>
                 <div className="space-y-3">
                   {daysOfWeek.map((day) => (
@@ -275,6 +318,9 @@ const DoctorProfile = () => {
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
+                          checked={
+                            editingDoc.availability[day]?.active || false
+                          }
                           checked={editingDoc.availability[day]?.active || false}
                           onChange={() => toggleDay(day)}
                         />
@@ -285,6 +331,9 @@ const DoctorProfile = () => {
                           <input
                             type="time"
                             value={editingDoc.availability[day].from}
+                            onChange={(e) =>
+                              updateTime(day, "from", e.target.value)
+                            }
                             onChange={(e) => updateTime(day, "from", e.target.value)}
                             className="border rounded-md px-2 py-1"
                           />
@@ -292,6 +341,9 @@ const DoctorProfile = () => {
                           <input
                             type="time"
                             value={editingDoc.availability[day].to}
+                            onChange={(e) =>
+                              updateTime(day, "to", e.target.value)
+                            }
                             onChange={(e) => updateTime(day, "to", e.target.value)}
                             className="border rounded-md px-2 py-1"
                           />
@@ -305,6 +357,8 @@ const DoctorProfile = () => {
           ) : (
             <>
               <p>
+                <strong>Specializations:</strong>{" "}
+                {currentDoc.specializations.join(", ")}
                 <strong>Specializations:</strong> {currentDoc.specializations.join(", ")}
               </p>
               <p>
