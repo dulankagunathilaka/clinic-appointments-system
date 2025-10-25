@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
-import { fetchActiveDoctors, fetchAvailableTimeSlots, createAppointment } from '../services/appointmentService';
+import axios from 'axios';
 
 const FormInput = ({ type = 'text', placeholder, icon: Icon, isSelect = false, value, onChange, options = [], disabled = false }) => {
   return (
@@ -66,6 +66,26 @@ const FormTextarea = ({ placeholder, value, onChange }) => {
 };
 
 const AppointmentFormSection = () => {
+  // Mock doctors data
+  const mockDoctors = [
+    { id: '1', name: 'Dr. Sarah Johnson', specialization: 'General Physician' },
+    { id: '2', name: 'Dr. Michael Chen', specialization: 'Cardiologist' },
+    { id: '3', name: 'Dr. Priya Sharma', specialization: 'Pediatrician' },
+    { id: '4', name: 'Dr. James Wilson', specialization: 'Dermatologist' },
+    { id: '5', name: 'Dr. Emily Brown', specialization: 'Gynecologist' },
+    { id: '6', name: 'Dr. Robert Davis', specialization: 'Orthopedic' },
+    { id: '7', name: 'Dr. Lisa Anderson', specialization: 'Neurologist' },
+    { id: '8', name: 'Dr. David Martinez', specialization: 'ENT Specialist' }
+  ];
+
+  // Mock time slots
+  const mockTimeSlots = [
+    '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM',
+    '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
+    '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM',
+    '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM'
+  ];
+
   const [formData, setFormData] = useState({
     patientName: '',
     email: '',
@@ -76,62 +96,18 @@ const AppointmentFormSection = () => {
     reasonForVisit: '',
   });
 
-  const [doctors, setDoctors] = useState([]);
-  const [timeSlots, setTimeSlots] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fetch doctors on component mount
-  useEffect(() => {
-    const loadDoctors = async () => {
-      try {
-        const doctorsList = await fetchActiveDoctors();
-        setDoctors(doctorsList);
-      } catch (error) {
-        setErrorMessage('Failed to load doctors. Please try again.');
-      }
-    };
-    
-    loadDoctors();
-  }, []);
-
-  // Fetch time slots when doctor and date are selected
-  useEffect(() => {
-    const loadTimeSlots = async () => {
-      if (formData.doctorId && formData.appointmentDate) {
-        setLoadingSlots(true);
-        try {
-          const slots = await fetchAvailableTimeSlots(formData.doctorId, formData.appointmentDate);
-          setTimeSlots(slots);
-          // Reset selected time if it's not available anymore
-          if (formData.appointmentTime && !slots.includes(formData.appointmentTime)) {
-            setFormData(prev => ({ ...prev, appointmentTime: '' }));
-          }
-        } catch (error) {
-          setErrorMessage('Failed to load available time slots.');
-          setTimeSlots([]);
-        } finally {
-          setLoadingSlots(false);
-        }
-      }
-    };
-    
-    loadTimeSlots();
-  }, [formData.doctorId, formData.appointmentDate]);
+  const API_URL = 'http://localhost:4000/api';
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear time slot when doctor or date changes
-    if (field === 'doctorId' || field === 'appointmentDate') {
-      setFormData(prev => ({ ...prev, appointmentTime: '' }));
-    }
-    
     // Update doctor name when doctor is selected
     if (field === 'doctorId') {
-      const selectedDoctor = doctors.find(doc => doc._id === value);
+      const selectedDoctor = mockDoctors.find(doc => doc.id === value);
       setFormData(prev => ({ 
         ...prev, 
         doctorName: selectedDoctor ? selectedDoctor.name : '' 
@@ -146,36 +122,62 @@ const AppointmentFormSection = () => {
     setErrorMessage('');
 
     try {
-      await createAppointment(formData);
-      setSuccessMessage('Appointment booked successfully! We will contact you shortly.');
-      
-      // Reset form
-      setFormData({
-        patientName: '',
-        email: '',
-        doctorId: '',
-        doctorName: '',
-        appointmentDate: '',
-        appointmentTime: '',
-        reasonForVisit: '',
-      });
-      setTimeSlots([]);
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(''), 5000);
+      // Prepare data matching your backend AppointmentModel schema
+      const appointmentData = {
+        patientName: formData.patientName,
+        email: formData.email,
+        doctorId: formData.doctorId,
+        doctorName: formData.doctorName,
+        appointmentDate: formData.appointmentDate,
+        appointmentTime: formData.appointmentTime,
+        reasonForVisit: formData.reasonForVisit,
+        status: 'Pending'
+      };
+
+      console.log('Sending data:', appointmentData);
+
+      // Send to backend using the correct endpoint
+      const response = await axios.post(
+        `${API_URL}/appointments`,
+        appointmentData
+      );
+
+      if (response.data.success) {
+        setSuccessMessage('Appointment booked successfully! We will contact you shortly.');
+        
+        // Reset form
+        setFormData({
+          patientName: '',
+          email: '',
+          doctorId: '',
+          doctorName: '',
+          appointmentDate: '',
+          appointmentTime: '',
+          reasonForVisit: '',
+        });
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }
     } catch (error) {
-      setErrorMessage(error.message || 'Failed to book appointment. Please try again.');
+      console.error('Error booking appointment:', error);
+      console.error('Error response:', error.response?.data);
+      setErrorMessage(
+        error.response?.data?.message || 
+        error.response?.data?.error ||
+        'Failed to book appointment. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const doctorOptions = doctors.map(doctor => ({
-    value: doctor._id,
+  const doctorOptions = mockDoctors.map(doctor => ({
+    value: doctor.id,
     label: `${doctor.name} - ${doctor.specialization}`
   }));
 
-  const timeSlotOptions = timeSlots.map(slot => ({
+  const timeSlotOptions = mockTimeSlots.map(slot => ({
     value: slot,
     label: slot
   }));
@@ -196,14 +198,14 @@ const AppointmentFormSection = () => {
             
             {/* Success Message */}
             {successMessage && (
-              <div className="mb-6 p-4 bg-green-500 text-white rounded-lg">
+              <div className="mb-6 p-4 bg-green-500 text-white rounded-lg font-semibold">
                 {successMessage}
               </div>
             )}
             
             {/* Error Message */}
             {errorMessage && (
-              <div className="mb-6 p-4 bg-red-500 text-white rounded-lg">
+              <div className="mb-6 p-4 bg-red-500 text-white rounded-lg font-semibold">
                 {errorMessage}
               </div>
             )}
@@ -229,7 +231,6 @@ const AppointmentFormSection = () => {
                 value={formData.doctorId}
                 onChange={(e) => handleInputChange('doctorId', e.target.value)}
                 options={doctorOptions}
-                disabled={doctors.length === 0}
               />
               
               <FormInput 
@@ -238,16 +239,14 @@ const AppointmentFormSection = () => {
                 type="date"
                 value={formData.appointmentDate}
                 onChange={(e) => handleInputChange('appointmentDate', e.target.value)}
-                disabled={!formData.doctorId}
               />
               
               <FormInput 
-                placeholder={loadingSlots ? "Loading slots..." : "Select Time"} 
+                placeholder="Select Time" 
                 isSelect={true}
                 value={formData.appointmentTime}
                 onChange={(e) => handleInputChange('appointmentTime', e.target.value)}
                 options={timeSlotOptions}
-                disabled={!formData.appointmentDate || timeSlots.length === 0 || loadingSlots}
               />
               
               {/* Reason/Symptoms Field - Spans full width */}
