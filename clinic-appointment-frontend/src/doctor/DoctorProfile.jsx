@@ -7,6 +7,18 @@ const DoctorProfile = () => {
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   const defaultDoctor = {
+    firstName: "Amal",
+    lastName: "Perera",
+    nic: "200012345678",
+    dob: "1980-05-10",
+    title: "Consultant Cardiologist",
+    specializations: ["Cardiology", "Internal Medicine"],
+    fee: 5000,
+    phone: "+94 77 123 4567",
+    email: "amal.perera@example.com",
+    address: "No. 123, Galle Road, Colombo 03",
+    registration: "SLMC/12345",
+    notes: "Specializes in heart conditions. Fluent in Sinhala & English.",
     firstName: "",
     lastName: "",
     title: "",
@@ -29,6 +41,14 @@ const DoctorProfile = () => {
   const [doc, setDoc] = useState(defaultDoctor);
   const [editingDoc, setEditingDoc] = useState(defaultDoctor);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Load from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("doctorProfile");
+    if (saved) {
+      setDoc(JSON.parse(saved));
+    }
+  }, []);
   const [imageFile, setImageFile] = useState(null);
 
   const doctorId = "670fd96e7b2b0f6f2e8a1f99"; // sample ID
@@ -53,6 +73,13 @@ const DoctorProfile = () => {
   const handleCancel = () => {
     setEditingDoc(doc);
     setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    setDoc(editingDoc);
+    localStorage.setItem("doctorProfile", JSON.stringify(editingDoc));
+    setIsEditing(false);
+    alert("Doctor profile saved!");
     setImageFile(null);
   };
 
@@ -62,6 +89,12 @@ const DoctorProfile = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateField("profileImage", reader.result);
+      };
+      reader.readAsDataURL(file);
     if (file) setImageFile(file);
   };
 
@@ -99,6 +132,7 @@ const DoctorProfile = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8 border-b pb-4">
           <h1 className="text-3xl font-bold text-gray-800">Doctor Profile</h1>
+          {!isEditing ? (
           {!isEditing && (
             <button
               onClick={handleEdit}
@@ -106,6 +140,7 @@ const DoctorProfile = () => {
             >
               Edit Profile
             </button>
+          ) : null}
           )}
         </div>
 
@@ -114,6 +149,8 @@ const DoctorProfile = () => {
           <div className="relative">
             <img
               src={
+                currentDoc.profileImage ||
+                "https://www.outsourceyourmarketing.co.uk/wp-content/uploads/2023/09/doctor-linkedin-marketing-10.jpeg"
                 imageFile
                   ? URL.createObjectURL(imageFile)
                   : currentDoc.profileImage ||

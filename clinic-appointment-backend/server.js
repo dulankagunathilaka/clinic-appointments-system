@@ -1,9 +1,17 @@
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import connectDB from "./config/mongodb.js";
+import connectCloudinary from "./config/cloudinary.js";
+import router from "./routes/PatientRoutes.js";
+import userRouter from "./routes/UserRoutes.js";
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import router from './routes/PatientRoutes.js';
+import appointmentRouter from './routes/AppointmentRoutes.js';
 import doctorRoutes from "./routes/doctorRoutes.js";
 
 // App Config
@@ -19,9 +27,17 @@ app.use(express.json());
 app.use(cors());
 
 // API routes
+app.use("/api/patients", router);
+app.use("/api/users", userRouter);
 app.use('/api/patients', router);
+app.use('/api/appointments', appointmentRouter);
 app.use("/api/doctors", doctorRoutes);
 
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("API Working ");
+app.use('/api/patients', router);
 
 // Test route
 app.get('/', (req, res) => {
