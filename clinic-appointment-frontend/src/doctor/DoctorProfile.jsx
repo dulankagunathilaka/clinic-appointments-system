@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { MdPerson, MdPhone, MdEmail } from "react-icons/md";
-import { FaStethoscope, FaCamera } from "react-icons/fa";
+import { FaCamera } from "react-icons/fa";
 
 const DoctorProfile = () => {
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const defaultDoctor = {
     firstName: "Amal",
@@ -17,20 +24,8 @@ const DoctorProfile = () => {
     phone: "+94 77 123 4567",
     email: "amal.perera@example.com",
     address: "No. 123, Galle Road, Colombo 03",
-    registration: "SLMC/12345",
+    registrationNumber: "SLMC/12345",
     notes: "Specializes in heart conditions. Fluent in Sinhala & English.",
-    firstName: "",
-    lastName: "",
-    title: "",
-    specializations: [],
-    email: "",
-    phone: "",
-    address: "",
-    dob: "",
-    nic: "",
-    registrationNumber: "",
-    fee: 0,
-    notes: "",
     profileImage: "",
     availability: daysOfWeek.reduce((acc, day) => {
       acc[day] = { active: false, from: "09:00", to: "12:00" };
@@ -41,18 +36,11 @@ const DoctorProfile = () => {
   const [doc, setDoc] = useState(defaultDoctor);
   const [editingDoc, setEditingDoc] = useState(defaultDoctor);
   const [isEditing, setIsEditing] = useState(false);
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("doctorProfile");
-    if (saved) {
-      setDoc(JSON.parse(saved));
-    }
-  }, []);
   const [imageFile, setImageFile] = useState(null);
 
   const doctorId = "670fd96e7b2b0f6f2e8a1f99"; // sample ID
 
+  // ✅ Fetch doctor data from API
   useEffect(() => {
     const fetchDoctor = async () => {
       try {
@@ -65,6 +53,7 @@ const DoctorProfile = () => {
     fetchDoctor();
   }, [doctorId]);
 
+  // ✅ Handle Edit Mode
   const handleEdit = () => {
     setEditingDoc(doc);
     setIsEditing(true);
@@ -75,29 +64,20 @@ const DoctorProfile = () => {
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    setDoc(editingDoc);
-    localStorage.setItem("doctorProfile", JSON.stringify(editingDoc));
-    setIsEditing(false);
-    alert("Doctor profile saved!");
-    setImageFile(null);
-  };
-
-  const updateField = (field, value) => {
-    setEditingDoc((prev) => ({ ...prev, [field]: value }));
-  };
-
+  // ✅ Handle Image Change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateField("profileImage", reader.result);
+        setEditingDoc((prev) => ({ ...prev, profileImage: reader.result }));
       };
       reader.readAsDataURL(file);
-    if (file) setImageFile(file);
+    }
   };
 
+  // ✅ Save (API Update)
   const handleSave = async () => {
     try {
       const formData = new FormData();
@@ -110,9 +90,11 @@ const DoctorProfile = () => {
       }
       if (imageFile) formData.append("profileImage", imageFile);
 
-      const res = await axios.put(`http://localhost:4000/api/doctors/${doctorId}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axios.put(
+        `http://localhost:4000/api/doctors/${doctorId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
       setDoc(res.data.doctor);
       setIsEditing(false);
@@ -124,6 +106,10 @@ const DoctorProfile = () => {
     }
   };
 
+  const updateField = (field, value) => {
+    setEditingDoc((prev) => ({ ...prev, [field]: value }));
+  };
+
   const currentDoc = isEditing ? editingDoc : doc;
 
   return (
@@ -132,7 +118,6 @@ const DoctorProfile = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8 border-b pb-4">
           <h1 className="text-3xl font-bold text-gray-800">Doctor Profile</h1>
-          {!isEditing ? (
           {!isEditing && (
             <button
               onClick={handleEdit}
@@ -140,7 +125,6 @@ const DoctorProfile = () => {
             >
               Edit Profile
             </button>
-          ) : null}
           )}
         </div>
 
@@ -149,8 +133,6 @@ const DoctorProfile = () => {
           <div className="relative">
             <img
               src={
-                currentDoc.profileImage ||
-                "https://www.outsourceyourmarketing.co.uk/wp-content/uploads/2023/09/doctor-linkedin-marketing-10.jpeg"
                 imageFile
                   ? URL.createObjectURL(imageFile)
                   : currentDoc.profileImage ||
@@ -162,7 +144,12 @@ const DoctorProfile = () => {
             {isEditing && (
               <label className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700">
                 <FaCamera className="text-white" />
-                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </label>
             )}
           </div>

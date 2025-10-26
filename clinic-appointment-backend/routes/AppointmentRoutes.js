@@ -8,6 +8,8 @@ import {
   updateAppointmentStatus,
   deleteAppointment,
   getAppointmentStats,
+  getAppointmentsByDoctorId,
+  getAppointmentsByPatientId
 } from '../controllers/AppointmentController.js';
 
 const router = express.Router();
@@ -35,5 +37,12 @@ router.patch('/:id/status', updateAppointmentStatus);
 
 // Delete an appointment
 router.delete('/:id', deleteAppointment);
+
+// Fetch appointments by doctor
+router.get('/doctor/id/:doctorId', getAppointmentsByDoctorId);
+
+// Fetch appointments by patient
+router.get('/patient/id/:patientId', getAppointmentsByPatientId);
+
 
 export default router;
