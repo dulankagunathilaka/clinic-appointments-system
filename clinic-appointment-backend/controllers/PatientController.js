@@ -1,5 +1,4 @@
 import PatientModel from "../models/PatientModel.js";
-import PatientModel from '../models/PatientModel.js';
 
 // Create a new patient
 export const addPatient = async (req, res) => {
@@ -16,14 +15,6 @@ export const addPatient = async (req, res) => {
     res.status(400).json({
       success: false,
       message: "Failed to add patient",
-      message: 'Patient added successfully',
-      data: savedPatient,
-    });
-  } catch (error) {
-    console.error('Error adding patient:', error);
-    res.status(400).json({
-      success: false,
-      message: 'Failed to add patient',
       error: error.message,
     });
   }
@@ -43,10 +34,6 @@ export const getAllPatients = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to retrieve patients",
-    console.error('Error fetching patients:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve patients',
       error: error.message,
     });
   }
@@ -57,10 +44,9 @@ export const getPatientById = async (req, res) => {
   try {
     const { id } = req.params;
     const patient = await PatientModel.findById(id);
+
     if (!patient) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Patient not found" });
+      return res.status(404).json({ success: false, message: "Patient not found" });
     }
 
     // Restrict patients to their own data
@@ -68,14 +54,12 @@ export const getPatientById = async (req, res) => {
       return res.status(403).json({ success: false, message: "Access denied" });
     }
 
-      return res.status(404).json({ success: false, message: 'Patient not found' });
-    }
     res.status(200).json({ success: true, data: patient });
   } catch (error) {
+    console.error("Error retrieving patient:", error);
     res.status(500).json({
       success: false,
       message: "Error retrieving patient",
-      message: 'Error retrieving patient',
       error: error.message,
     });
   }
@@ -89,26 +73,21 @@ export const updatePatient = async (req, res) => {
       new: true,
       runValidators: true,
     });
+
     if (!updatedPatient) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Patient not found" });
+      return res.status(404).json({ success: false, message: "Patient not found" });
     }
+
     res.status(200).json({
       success: true,
       message: "Patient updated successfully",
-      return res.status(404).json({ success: false, message: 'Patient not found' });
-    }
-    res.status(200).json({
-      success: true,
-      message: 'Patient updated successfully',
       data: updatedPatient,
     });
   } catch (error) {
+    console.error("Error updating patient:", error);
     res.status(400).json({
       success: false,
       message: "Failed to update patient",
-      message: 'Failed to update patient',
       error: error.message,
     });
   }
@@ -119,25 +98,20 @@ export const deletePatient = async (req, res) => {
   try {
     const { id } = req.params;
     const deletedPatient = await PatientModel.findByIdAndDelete(id);
+
     if (!deletedPatient) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Patient not found" });
+      return res.status(404).json({ success: false, message: "Patient not found" });
     }
+
     res.status(200).json({
       success: true,
       message: "Patient deleted successfully",
-      return res.status(404).json({ success: false, message: 'Patient not found' });
-    }
-    res.status(200).json({
-      success: true,
-      message: 'Patient deleted successfully',
     });
   } catch (error) {
+    console.error("Error deleting patient:", error);
     res.status(500).json({
       success: false,
       message: "Failed to delete patient",
-      message: 'Failed to delete patient',
       error: error.message,
     });
   }

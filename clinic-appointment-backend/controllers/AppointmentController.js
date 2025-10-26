@@ -237,3 +237,29 @@ export const getAppointmentStats = async (req, res) => {
     });
   }
 };
+
+// Get appointments by Doctor ID
+export const getAppointmentsByDoctorId = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const appointments = await AppointmentModel.find({ doctorId })
+      .populate('patientId', 'name email'); // populate patient info if exists
+    res.status(200).json({ success: true, data: appointments });
+  } catch (error) {
+    console.error('Error fetching appointments by doctor:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch appointments', error: error.message });
+  }
+};
+
+// Get appointments by Patient ID
+export const getAppointmentsByPatientId = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const appointments = await AppointmentModel.find({ patientId })
+      .populate('doctorId', 'doctorName'); // populate doctor info
+    res.status(200).json({ success: true, data: appointments });
+  } catch (error) {
+    console.error('Error fetching appointments by patient:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch appointments', error: error.message });
+  }
+};
