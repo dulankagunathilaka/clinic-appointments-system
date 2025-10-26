@@ -1,4 +1,5 @@
 import Doctor from "../models/Doctor.js";
+import cloudinary from "cloudinary";
 
 // Add new doctor
 export const addDoctor = async (req, res) => {
@@ -21,13 +22,11 @@ export const getDoctors = async (req, res) => {
   }
 };
 
-// Get single doctor by ID
+// Get doctor by ID
 export const getDoctorById = async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id);
-    if (!doctor) {
-      return res.status(404).json({ message: "Doctor not found" });
-    }
+    if (!doctor) return res.status(404).json({ message: "Doctor not found" });
     res.status(200).json(doctor);
   } catch (error) {
     res.status(500).json({ message: "Error fetching doctor", error });
@@ -37,7 +36,34 @@ export const getDoctorById = async (req, res) => {
 // Update doctor details
 export const updateDoctor = async (req, res) => {
   try {
-    const updated = await Doctor.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    let updateData = { ...req.body };
+
+    // Parse JSON fields
+    if (req.body.availability) {
+      updateData.availability = JSON.parse(req.body.availability);
+    }
+    if (req.body.specializations) {
+      updateData.specializations = JSON.parse(req.body.specializations);
+    }
+
+    // Upload image if provided
+    if (req.file) {
+      const uploadRes = await cloudinary.v2.uploader.upload_stream(
+        { folder: "doctors" },
+        async (error, result) => {
+          if (error) return res.status(500).json({ message: "Cloudinary upload error", error });
+
+          updateData.profileImage = result.secure_url;
+          const updatedDoctor = await Doctor.findByIdAndUpdate(req.params.id, updateData, { new: true });
+          res.json({ message: "Doctor updated", doctor: updatedDoctor });
+        }
+      );
+
+      req.file.stream.pipe(uploadRes);
+      return;
+    }
+
+    const updated = await Doctor.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({ message: "Doctor updated", doctor: updated });
   } catch (error) {
     res.status(500).json({ message: "Error updating doctor", error });
@@ -57,11 +83,7 @@ export const deleteDoctor = async (req, res) => {
 // Approve doctor
 export const approveDoctor = async (req, res) => {
   try {
-    const doctor = await Doctor.findByIdAndUpdate(
-      req.params.id,
-      { isApproved: true },
-      { new: true }
-    );
+    const doctor = await Doctor.findByIdAndUpdate(req.params.id, { isApproved: true }, { new: true });
     res.json({ message: "Doctor approved", doctor });
   } catch (error) {
     res.status(500).json({ message: "Error approving doctor", error });

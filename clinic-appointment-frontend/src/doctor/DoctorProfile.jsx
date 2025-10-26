@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MdPerson, MdPhone, MdEmail } from "react-icons/md";
-import { FaStethoscope, FaPills, FaCamera } from "react-icons/fa";
+import { FaStethoscope, FaCamera } from "react-icons/fa";
 
 const DoctorProfile = () => {
-  const daysOfWeek = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   const defaultDoctor = {
     firstName: "Amal",
@@ -59,9 +51,8 @@ const DoctorProfile = () => {
   }, []);
   const [imageFile, setImageFile] = useState(null);
 
-  const doctorId = "replace_with_logged_in_doctor_id"; // replace with actual ID
+  const doctorId = "670fd96e7b2b0f6f2e8a1f99"; // sample ID
 
-  // Fetch doctor from backend
   useEffect(() => {
     const fetchDoctor = async () => {
       try {
@@ -96,29 +87,6 @@ const DoctorProfile = () => {
     setEditingDoc((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleDay = (day) => {
-    setEditingDoc((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        [day]: {
-          ...prev.availability[day],
-          active: !prev.availability[day].active,
-        },
-      },
-    }));
-  };
-
-  const updateTime = (day, type, value) => {
-    setEditingDoc((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        [day]: { ...prev.availability[day], [type]: value },
-      },
-    }));
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -133,28 +101,20 @@ const DoctorProfile = () => {
   const handleSave = async () => {
     try {
       const formData = new FormData();
-
-      // Add all fields
       for (const key in editingDoc) {
-        if (key === "availability") {
-          formData.append(key, JSON.stringify(editingDoc[key]));
-        } else if (key === "specializations") {
+        if (key === "availability" || key === "specializations") {
           formData.append(key, JSON.stringify(editingDoc[key]));
         } else {
           formData.append(key, editingDoc[key]);
         }
       }
-
-      // Add profile image if changed
       if (imageFile) formData.append("profileImage", imageFile);
 
-      const res = await axios.put(
-        `http://localhost:4000/api/doctors/${doctorId}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const res = await axios.put(`http://localhost:4000/api/doctors/${doctorId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      setDoc(res.data);
+      setDoc(res.data.doctor);
       setIsEditing(false);
       setImageFile(null);
       alert("Profile updated successfully!");
@@ -202,12 +162,7 @@ const DoctorProfile = () => {
             {isEditing && (
               <label className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700">
                 <FaCamera className="text-white" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </label>
             )}
           </div>
@@ -217,237 +172,75 @@ const DoctorProfile = () => {
           <p className="text-gray-500">{currentDoc.title}</p>
         </div>
 
-        {/* Personal Info */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2 mb-4">
-            <MdPerson /> Personal Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {isEditing ? (
-              <>
-                <div>
-                  <label className="text-sm text-gray-500">First Name</label>
-                  <input
-                    value={editingDoc.firstName}
-                    onChange={(e) => updateField("firstName", e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">Last Name</label>
-                  <input
-                    value={editingDoc.lastName}
-                    onChange={(e) => updateField("lastName", e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">NIC</label>
-                  <input
-                    value={editingDoc.nic}
-                    onChange={(e) => updateField("nic", e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">Date of Birth</label>
-                  <input
-                    type="date"
-                    value={editingDoc.dob}
-                    onChange={(e) => updateField("dob", e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border rounded-md"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <p>
-                  <strong>NIC:</strong> {currentDoc.nic}
-                </p>
-                <p>
-                  <strong>Date of Birth:</strong> {currentDoc.dob}
-                </p>
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* Channeling Details */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2 mb-4">
-            <FaStethoscope /> Channeling Details
-          </h2>
-          {isEditing ? (
-            <>
-              <div className="mb-4">
-                <label className="text-sm text-gray-500">Specializations</label>
-                <input
-                  value={editingDoc.specializations.join(", ")}
-                  onChange={(e) =>
-                    updateField(
-                      "specializations",
-                      e.target.value.split(",").map((s) => s.trim())
-                    )
-                  }
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="text-sm text-gray-500">
-                  Consultation Fee
-                </label>
-                <label className="text-sm text-gray-500">Consultation Fee</label>
-                <input
-                  type="number"
-                  value={editingDoc.fee}
-                  onChange={(e) => updateField("fee", Number(e.target.value))}
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-500 block mb-2">
-                  Availability
-                </label>
-                <label className="text-sm text-gray-500 block mb-2">Availability</label>
-                <div className="space-y-3">
-                  {daysOfWeek.map((day) => (
-                    <div
-                      key={day}
-                      className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
-                    >
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={
-                            editingDoc.availability[day]?.active || false
-                          }
-                          checked={editingDoc.availability[day]?.active || false}
-                          onChange={() => toggleDay(day)}
-                        />
-                        <span>{day}</span>
-                      </label>
-                      {editingDoc.availability[day]?.active && (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            value={editingDoc.availability[day].from}
-                            onChange={(e) =>
-                              updateTime(day, "from", e.target.value)
-                            }
-                            onChange={(e) => updateTime(day, "from", e.target.value)}
-                            className="border rounded-md px-2 py-1"
-                          />
-                          <span>to</span>
-                          <input
-                            type="time"
-                            value={editingDoc.availability[day].to}
-                            onChange={(e) =>
-                              updateTime(day, "to", e.target.value)
-                            }
-                            onChange={(e) => updateTime(day, "to", e.target.value)}
-                            className="border rounded-md px-2 py-1"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <p>
-                <strong>Specializations:</strong>{" "}
-                {currentDoc.specializations.join(", ")}
-                <strong>Specializations:</strong> {currentDoc.specializations.join(", ")}
-              </p>
-              <p>
-                <strong>Fee:</strong> Rs. {currentDoc.fee}
-              </p>
-              <div>
-                <strong>Availability:</strong>
-                <ul className="list-disc ml-6">
-                  {daysOfWeek.map((day) => {
-                    const val = currentDoc.availability[day];
-                    return val.active ? (
-                      <li key={day}>
-                        {day}: {val.from} - {val.to}
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
-              </div>
-            </>
-          )}
-        </section>
-
-        {/* Contact Info */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2 mb-4">
-            <MdPhone /> Contact Information
-          </h2>
-          {isEditing ? (
-            <div className="space-y-4">
-              <input
-                value={editingDoc.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
-                className="w-full mt-1 px-3 py-2 border rounded-md"
-              />
-              <input
-                value={editingDoc.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                className="w-full mt-1 px-3 py-2 border rounded-md"
-              />
-              <input
-                value={editingDoc.address}
-                onChange={(e) => updateField("address", e.target.value)}
-                className="w-full mt-1 px-3 py-2 border rounded-md"
-              />
-            </div>
-          ) : (
-            <>
-              <p>
-                <strong>Phone:</strong> {currentDoc.phone}
-              </p>
-              <p>
-                <strong>Email:</strong> {currentDoc.email}
-              </p>
-              <p>
-                <strong>Address:</strong> {currentDoc.address}
-              </p>
-            </>
-          )}
-        </section>
-
-        {/* Notes */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2 mb-4">
-            <FaPills /> Additional Notes
-          </h2>
-          {isEditing ? (
-            <textarea
-              value={editingDoc.notes}
-              onChange={(e) => updateField("notes", e.target.value)}
-              className="w-full mt-1 px-3 py-2 border rounded-md"
-              rows={4}
+        {/* Doctor Info */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <label className="block text-gray-600">First Name</label>
+            <input
+              type="text"
+              disabled={!isEditing}
+              value={currentDoc.firstName}
+              onChange={(e) => updateField("firstName", e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1"
             />
-          ) : (
-            <p>{currentDoc.notes}</p>
-          )}
-        </section>
+          </div>
 
-        {/* Buttons */}
+          <div>
+            <label className="block text-gray-600">Last Name</label>
+            <input
+              type="text"
+              disabled={!isEditing}
+              value={currentDoc.lastName}
+              onChange={(e) => updateField("lastName", e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-600">Email</label>
+            <input
+              type="email"
+              disabled={!isEditing}
+              value={currentDoc.email}
+              onChange={(e) => updateField("email", e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-600">Phone</label>
+            <input
+              type="text"
+              disabled={!isEditing}
+              value={currentDoc.phone}
+              onChange={(e) => updateField("phone", e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <label className="block text-gray-600">Address</label>
+            <textarea
+              disabled={!isEditing}
+              value={currentDoc.address}
+              onChange={(e) => updateField("address", e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1"
+            />
+          </div>
+        </div>
+
+        {/* Action Buttons */}
         {isEditing && (
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end mt-8 space-x-4">
             <button
               onClick={handleCancel}
-              className="px-5 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-5 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
             >
               Save Changes
             </button>
